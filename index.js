@@ -2,10 +2,9 @@
 
 
 const { Command } = require("commander");
-const { start } = require("repl");
 const contacts = require("./contacts.js");
-const program = new Command();
 
+const program = new Command();
 
 program
   .option("-a, --action <type>", "choose action")
@@ -14,37 +13,38 @@ program
   .option("-e, --email <type>", "user email")
   .option("-p, --phone <type>", "user phone");
 
-program.parse(process.options);
-
+program.parse(process.argv);
 const options = program.opts();
 
-// TODO: рефакторити
 async function invokeAction({ action, id, name, email, phone }) {
+  try {
     switch (action) {
       case "list":
         const allContacts = await contacts.listContacts();
-        return console.log(allContacts);
+        console.log(allContacts);
         break;
-  
+
       case "get":
         const contactById = await contacts.getContactById(id);
-        return console.log(contactById);
+        console.log(contactById);
         break;
-  
+
       case "add":
         const addedContact = await contacts.addContact(name, email, phone);
-        return console.log(addedContact);
+        console.log(addedContact);
         break;
-  
+
       case "remove":
-        const removeContact = await contacts.removeContact(id);
-        return console.log(removeContact);
+        const removedContact = await contacts.removeContact(id);
+        console.log(removedContact);
         break;
-  
+
       default:
         console.warn("\x1B[31m Unknown action type!");
     }
+  } catch (error) {
+    console.error("\x1B[31m An error occurred:", error.message);
   }
-  
-  invokeAction(options);
+}
 
+invokeAction(options);
